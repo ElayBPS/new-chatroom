@@ -44,7 +44,8 @@
         <!-- <button type="button" @click="showSmiley"><i class="material-icons">tag_faces</i></button> -->
         <VueEmoji @input="message=$event.data" @keypress.enter.prevent="sendMessage" ref="messageInput" class="message" placeholder="Message..."/>
         <button type="button" @click="stopRecord" v-if="recording"><i class="material-icons">mic_off</i></button>
-        <button type="button" @click="record" v-else><i class="material-icons">mic</i></button>
+        <button type="button" @click="record('audio')" v-if="!recording"><i class="material-icons">mic</i></button>
+        <button type="button" @click="record('video')" v-if="!recording"><i class="material-icons">radio_button_checked</i></button>
         <button type="button" @click="$refs.attach_file.click()"><i class="material-icons">attach_file</i></button>
         <input type="file" ref="attach_file" style="display:none" @change="sendFile">
         <input type="submit" value="Envoyer">
@@ -175,12 +176,14 @@ export default {
       this.mediaRecorder.stop()
       clearTimeout(this.recordTO)
     },
-    record: async function () {
+    record: async function (type="audio") {
     this.recording = true
+    const config = {audio: true, video: type === "video"}
     // Access user media and ask permission if needed
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    const stream = await navigator.mediaDevices.getUserMedia(config)
     // Instanciate MediaRecorder using media device
-    this.mediaRecorder = new MediaRecorder(stream, {mimeType : "audio/webm"})
+    const mimeType = type+"/webm"
+    this.mediaRecorder = new MediaRecorder(stream, {mimeType})
 
     // Stop the recording after 30 seconds
     this.recordTO = setTimeout(this.stopRecord, 30000)
@@ -199,9 +202,9 @@ export default {
    this.mediaRecorder.addEventListener("stop", async () => {
         this.recording = false
         // Transform our array into a Blob
-        const blob = new Blob(audioChunks)
+        const blob = new Blob(audioChunks, {type: mimeType})
         const id = firebase.firestore().collection("messages").doc().id;
-        firebase.storage().ref("files/" + id + ".webm").put(blob).then(upload => {
+        firebase.storage().ref("files/" + id + ".webm").put(blob, {contentType: mimeType}).then(upload => {
           return upload.ref.getDownloadURL()
         }).then(url => {
           const message = {
@@ -209,7 +212,7 @@ export default {
         username : this.username,
         src : url,
         date : firebase.firestore.FieldValue.serverTimestamp(),
-        type : "audio"
+        type
          }
         firebase.firestore().collection("messages").doc(message.id).set(message)
         })
