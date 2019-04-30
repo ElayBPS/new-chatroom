@@ -61,14 +61,8 @@ if ('serviceWorker' in navigator) {
 import VueEmoji from 'emoji-vue'
 import * as firebase from "firebase" 
 // Initialize Firebase
-  var config = {
-    apiKey: "AIzaSyDqeKQLwLppTbTIosIpKUlG1ZgHcTr9TBo",
-    authDomain: "chatroom-8071e.firebaseapp.com",
-    databaseURL: "https://chatroom-8071e.firebaseio.com",
-    projectId: "chatroom-8071e",
-    storageBucket: "chatroom-8071e.appspot.com",
-    messagingSenderId: "209996870682"
-  };
+import config from '@/assets/firebase-config.js' 
+
   firebase.initializeApp(config);
 
 const messaging = firebase.messaging();
