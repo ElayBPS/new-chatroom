@@ -3,12 +3,10 @@
 // are not available in the service worker.
 importScripts('https://www.gstatic.com/firebasejs/4.8.1/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/4.8.1/firebase-messaging.js');
-
+importScripts('/firebase-messaging-config.js')
 // Initialize the Firebase app in the service worker by passing in the
 // messagingSenderId.
-firebase.initializeApp({
-  'messagingSenderId': '209996870682'
-});
+firebase.initializeApp(config);
 
 // Retrieve an instance of Firebase Messaging so that it can handle background
 // messages.
