@@ -3,3 +3,5 @@ style.css
 dist
 
 firebase-config.js
+
+firebase-messaging-config.js
