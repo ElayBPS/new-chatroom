@@ -17,7 +17,7 @@ exports.sendNotification = functions.firestore.document("messages/{messageId}").
         text = '🎤 Audio'
     }
     else {
-        text = message.text
+        text = message.text;
     }
     // Retrouver la liste des utilisateurs depuis la database.
     return firebase.firestore().collection("users").get().then(users => {

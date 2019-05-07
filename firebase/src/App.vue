@@ -1,26 +1,27 @@
 <template>
   <div class="all" id="app">
-    <h1>Our Carribean Chat</h1>
+    <img class="banner" src="../public/bannière.jpg">
+    <button type="button" @click="logOut">🍍 Déconnexion 🍍</button>
     <div v-if="!user">
-      <h3>Bienvenue dans le Chat #1! Choisissez un nom d'utilisateur</h3>
+      <div class="connexion">
+      <h3>Bienvenue dans le Chat #1! Inscrivez-vous ou Connectez-vous!</h3>
       <form @submit.prevent="login" v-if="loginPanel === 'login'">
         <input class="username" type="email" placeholder="Entrez votre email" v-model="loginModel.email">
         <input class="username" type="password" placeholder="Entrez votre mot de passe" v-model="loginModel.password">
-        <input class="submit" type="submit" value="Rejoindre">
-        <a @click="loginPanel='register'">Vous pouvez vous inscrire ici</a>
+        <button class="submit" type="submit">Rejoindre</button>
+        <a @click="loginPanel='register'">🍍 Par ici pour s'inscrire!</a>
       </form>
       <form @submit.prevent="register" v-else-if="loginPanel === 'register'">
         <input class="username" type="email" placeholder="Entrez votre email" v-model="registerModel.email">
         <input class="username" type="username" placeholder="Entrez votre nom d'utilisateur" v-model="registerModel.username">
         <input class="username" type="password" placeholder="Entrez votre mot de passe" v-model="registerModel.password">
-        <input class="submit" type="submit" value="Rejoindre">
-        <a @click="loginPanel='login'">Déjà inscrit? Cliquez ici</a>
+        <button class="submit" type="submit">Rejoindre</button>
+        <a @click="loginPanel='login'">🍍 Déjà inscrit? Cliquez ici!</a>
       </form>
-      <div class=bouton>
-      <button @click="continueWithoutUsername">Rejoindre en tant qu'invité</button>
-      </div>
+    </div>
     </div>
     <div v-else>
+      <div class="sending">
       <ul ref="scroll" id="chatbox">
         <li v-for="(message, index) in messages" :key="'message-'+ index">
           <div class="message" v-if="message.type === 'text'">
@@ -40,6 +41,7 @@
           </div>
         </li>
       </ul>
+      </div>
       <form class="msg" @submit.prevent="sendMessage">
         <button class="ory3u">
             <span data-icon="smiley" class>
@@ -57,15 +59,15 @@
               </svg>
             </span>
         </button>
-        <input class="msg" type="text" placeholder="Tapez votre message..." v-model="message">
-        <button type="button" @click="stopRecord" v-if="recording"><i class="material-icons">mic_off</i></button>
+        <input class="msge" type="text" placeholder="Tapez votre message..." v-model="message">
+        <button type="button" @click="stopRecord" v-if="recording"><i class="material-icons">stop</i></button>
         <button type="button" @click="record('audio')" v-if="!recording"><i class="material-icons">mic</i></button>
-        <button type="button" @click="record('video')" v-if="!recording"><i class="material-icons">radio_button_checked</i></button>
+        <button type="button" @click="record('video')" v-if="!recording"><i class="material-icons">videocam</i></button>
         <button type="button" @click="$refs.attach_file.click()"><i class="material-icons">attach_file</i></button>
         <input type="file" ref="attach_file" style="display:none" @change="sendFile">
         <input type="submit" value="Envoyer">
       </form>
-      <button type="button" @click="logOut">Déconnexion</button>
+    
     </div>
   </div>
 </template>
@@ -127,7 +129,8 @@ export default {
         username : this.username,
         text : this.message,
         date : firebase.firestore.FieldValue.serverTimestamp(),
-        type : "text"
+        type : "text",
+        // userId : 
       }
       firebase.firestore().collection("messages").doc(message.id).set(message)
       this.message = "";
@@ -159,12 +162,13 @@ export default {
         })
         this.$refs.scroll.scrollTop = this.$refs.scroll.scrollHeight
         getNotificationToken()
+        firebase.firestore().collection("users").doc(firebase.auth().currentUser.uid).set(user)
       })
       }
     },
-    continueWithoutUsername: function() {
-      this.state = 1;
-    },
+    // continueWithoutUsername: function() {
+    //   this.state = 1;
+    // },
     sendFile: function(e) {
       const file = e.target.files[0];
       if (file) {
